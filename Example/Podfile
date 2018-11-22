@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'Savior_Example' do
+  pod 'Savior', :path => '../'
+
+  target 'Savior_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

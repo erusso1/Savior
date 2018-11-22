@@ -32,11 +32,12 @@ Pod::Spec.new do |s|
 
   s.source_files = 'Savior/Classes/**/*'
   
+  s.swift_version = '4.2'
+  
   s.subspec 'Realm' do |realm|
       realm.ios.deployment_target = '11.0'
-      realm.source_files = 'Savior/Classes/Realm/**/*'
+      realm.source_files = 'Savior/Classes/Realm/*.{swift}'
       realm.dependency 'RealmSwift'
-      
   end
   
   # s.resource_bundles = {

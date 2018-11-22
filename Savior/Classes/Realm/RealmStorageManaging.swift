@@ -8,7 +8,7 @@ public protocol RealmStorageManaging: StorageManaging { }
 extension RealmStorageManaging where Self : Object {
     
     public func save() throws {
-        
+                
         let realm = try Savior.realm()
         try realm.write {
             realm.add(self, update: true)

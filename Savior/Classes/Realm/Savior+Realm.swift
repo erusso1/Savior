@@ -11,7 +11,16 @@ import RealmSwift
 
 extension NotificationToken: StorageObservingToken { }
 
-extension Realm: SwiftyDataStoring {
+extension Realm: StorageProviding {
+    
+    public static func instance(encryptionKey: Data?, enableMigrations: Bool) throws -> Realm {
+        
+        let config = Realm.Configuration(encryptionKey: encryptionKey, deleteRealmIfMigrationNeeded: !enableMigrations)
+        
+        //config.fileURL = config.fileURL!.deletingLastPathComponent().appendingPathComponent("Savior-disk.realm")
+        
+        return try Realm(configuration: config)
+    }
     
     public func clear() throws {
         
@@ -23,18 +32,11 @@ extension Realm: SwiftyDataStoring {
 
 extension Savior {
     
-    internal static func database() throws -> SwiftyDataStoring {
-        
-        return try realm()
-    }
-    
     internal static func realm() throws -> Realm {
         
-        let config = Realm.Configuration(encryptionKey: encryptionKey, deleteRealmIfMigrationNeeded: !isMigrationEnabled)
-        
-        //config.fileURL = config.fileURL!.deletingLastPathComponent().appendingPathComponent("Savior-disk.realm")
-        
-        return try Realm(configuration: config)
+        guard let provider = Savior.provider else { throw SaviorError.noProvider }
+        guard let realm = provider as? Realm else { throw SaviorError.incorrectProvider(provider: provider) }
+        return realm
     }
 }
 
@@ -42,16 +44,15 @@ extension Sequence where Element : Storable, Element.ManagedType : (Object & Rea
     
     public func save() throws {
         
-        let managedObjects = try self.map { try $0.managedObject() }
-
         let realm = try Savior.realm()
+        let managedObjects = try self.map { try $0.managedObject() }
         try realm.write {
             realm.add(managedObjects, update: true)
         }        
     }
     
     public func delete() throws {
-        
+    
         let realm = try Savior.realm()
         let items = realm.objects(Element.ManagedType.self).filter("identifier IN %@", self.map { String($0.identifier) })
         try realm.write {

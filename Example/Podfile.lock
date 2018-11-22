@@ -6,8 +6,10 @@ PODS:
     - Realm (= 3.11.2)
   - Savior (1.0.0):
     - Savior/Realm (= 1.0.0)
+  - Savior/Core (1.0.0)
   - Savior/Realm (1.0.0):
     - RealmSwift
+    - Savior/Core
 
 DEPENDENCIES:
   - Savior (from `../`)
@@ -24,7 +26,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Realm: 864477d028db77f7c5a0cba64a4892ad53db128a
   RealmSwift: 12b8262fc08020b47de4fd88eb3d5c9425b34ec7
-  Savior: 85710a8544bee7ecd4ba4aa69eaf492372cef13d
+  Savior: 97dbf734e7e5dccec797b3180eb577509c29a0ec
 
 PODFILE CHECKSUM: d7649d8ecea5f874a199ff23ba35b5899d5616a6
 

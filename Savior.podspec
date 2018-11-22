@@ -27,16 +27,19 @@ Pod::Spec.new do |s|
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '11.0'
-
   s.default_subspec = 'Realm'
-
   s.source_files = 'Savior/Classes/**/*'
-  
   s.swift_version = '4.2'
+  
+  s.subspec 'Core' do |core|
+      core.ios.deployment_target = '11.0'
+      core.source_files = 'Savior/Classes/Core/*.{swift}'
+  end
   
   s.subspec 'Realm' do |realm|
       realm.ios.deployment_target = '11.0'
       realm.source_files = 'Savior/Classes/Realm/*.{swift}'
+      realm.dependency 'Savior/Core'
       realm.dependency 'RealmSwift'
   end
   

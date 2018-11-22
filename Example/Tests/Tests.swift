@@ -1,9 +1,17 @@
 import XCTest
+import RealmSwift
 import Savior
 
 class Tests: XCTestCase {
     
     private let stressCount = 10000
+    
+    override class func setUp() {
+        
+        super.setUp()
+        
+        try! Savior.useProvider(Realm.self, encryptionKey: nil, enableMigrations: true)
+    }
         
     override func setUp() {
         super.setUp()

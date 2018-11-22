@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Savior'
-  s.version          = '0.1.0'
-  s.summary          = 'A short description of Savior.'
+  s.version          = '1.0.0'
+  s.summary          = 'Savior is a lightweight Swift ORM that makes persistence delightful.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -17,9 +17,7 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
-  s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
+  s.description      = 'Savior is a client-side ORM written in Swift for make storing data delightful. Built to be data-agnostic, Savior lets you easily add persistence capabilities to your iOS app. The best part is it doesn\'t require you to change or subclass your existing data models. Just conform your models to the \'Storable\' protocol to get started. Currently Realm is the default provider, but Pull Requests are welcome to add more!'
 
   s.homepage         = 'https://github.com/erusso1/Savior'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
@@ -28,9 +26,18 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/erusso1/Savior.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '11.0'
+
+  s.default_subspec = 'Realm'
 
   s.source_files = 'Savior/Classes/**/*'
+  
+  s.subspec 'Realm' do |realm|
+      realm.ios.deployment_target = '11.0'
+      realm.source_files = 'Savior/Classes/Realm/**/*'
+      realm.dependency 'RealmSwift'
+      
+  end
   
   # s.resource_bundles = {
   #   'Savior' => ['Savior/Assets/*.png']

@@ -27,10 +27,14 @@ public protocol StorageManaging {
     
     static func count() throws -> Int
     
-    static func query(_ predicate: String?) throws -> [Self]
+    static func query(_ predicateFormat: String?, _ args: Any...) throws -> [Self]
     
-    static func query<T: NSObject & StorageObserving>(_ predicate: String?, observer: T, keyPath: ReferenceWritableKeyPath<T, [StorageType]>) throws -> [Self]
+    static func query(_ predicate: NSPredicate?) throws -> [Self]
     
+    static func query<T: NSObject & StorageObserving>(_ predicateFormat: String?, args: [Any], observer: T, keyPath: ReferenceWritableKeyPath<T, [StorageType]>) throws -> [Self]
+    
+    static func query<T: NSObject & StorageObserving>(_ predicate: NSPredicate?, observer: T, keyPath: ReferenceWritableKeyPath<T, [StorageType]>) throws -> [Self]
+
     static func find(byId identifier: String) throws -> Self?
     
     static func deleteAll() throws

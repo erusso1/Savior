@@ -16,9 +16,9 @@ public protocol StorageObserving: class {
     
     var storageObservingToken: StorageObservingToken! { get set }
     
-    func didObserveInitialCollection<T: Storable>(items: [T], predicate: String?, keyPath: AnyKeyPath)
+    func didObserveInitialCollection<T: Storable>(items: [T], predicate: NSPredicate?, keyPath: AnyKeyPath)
     
-    func didObserveUpdatedCollection<T: Storable>(items: [T], predicate: String?, deleted: [Int], inserted: [Int], modified: [Int], keyPath: AnyKeyPath)
+    func didObserveUpdatedCollection<T: Storable>(items: [T], predicate: NSPredicate?, deleted: [Int], inserted: [Int], modified: [Int], keyPath: AnyKeyPath)
     
     func didObserveCollectionError(_ error: Error)
 }

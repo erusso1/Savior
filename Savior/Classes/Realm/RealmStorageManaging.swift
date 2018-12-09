@@ -29,17 +29,29 @@ extension RealmStorageManaging where Self : Object {
         return try query().count
     }
     
-    public static func query(_ predicate: String? = nil) throws -> [Self] {
+    public static func query(_ predicateFormat: String? = nil, _ args: Any...) throws -> [Self] {
+        
+        let predicate: NSPredicate? = predicateFormat == nil ? nil : NSPredicate(format: predicateFormat!, args)
+        return try query(predicate)
+    }
+    
+    public static func query(_ predicate: NSPredicate?) throws -> [Self] {
         
         let realm = try Realm()
-        let result = realm.objects(Self.self).filter(predicate ?? "TRUEPREDICATE")
+        let result = realm.objects(Self.self).filter(predicate ??  NSPredicate(format: "TRUEPREDICATE"))
         return Array(result)
     }
     
-    public static func query<T: NSObject & StorageObserving>(_ predicate: String?, observer: T, keyPath: ReferenceWritableKeyPath<T, [StorageType]>) throws -> [Self] {
+    public static func query<T: NSObject & StorageObserving>(_ predicateFormat: String?, args: [Any], observer: T, keyPath: ReferenceWritableKeyPath<T, [StorageType]>) throws -> [Self] {
 
+        let predicate: NSPredicate? = predicateFormat == nil ? nil : NSPredicate(format: predicateFormat!, args)
+        return try query(predicate, observer: observer, keyPath: keyPath)
+    }
+    
+    public static func query<T: NSObject & StorageObserving>(_ predicate: NSPredicate?, observer: T, keyPath: ReferenceWritableKeyPath<T, [StorageType]>) throws -> [Self] {
+        
         let realm = try Realm()
-        let result = realm.objects(Self.self).filter(predicate ?? "TRUEPREDICATE")
+        let result = realm.objects(Self.self).filter(predicate ?? NSPredicate(format: "TRUEPREDICATE"))
         
         observer.storageObservingToken = result.observe { [weak observer] changes in
             

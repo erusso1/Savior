@@ -125,6 +125,29 @@ class Tests: XCTestCase {
 
         wait(for: [initialExpection, updatedExpection], timeout: 5)
     }
+    
+    func testJoinQuery() {
+        
+        do {
+            
+            let ephraim = Person(name: "Ephraim", id: 1)
+            let chloe = Person(name: "Chloe", id: 2)
+            
+            let lilly = Pet(name: "Lilly", id: 1, ownerId: 2)
+            let pug = Pet(name: "Mr. Pug", id: 2, ownerId: 1)
+            
+            try [ephraim, chloe].save()
+            try [lilly, pug].save()
+            
+            XCTAssertEqual(try Person.count(), 2)
+            XCTAssertEqual(try Pet.count(), 2)
+
+            let pets = try Pet.query(nil, joining: Person.self, foreignKey: "ownerId", joinedPredicateFormat: "name == '\(ephraim.name)'")
+            XCTAssertEqual(pets.first!.name, pug.name)
+
+        } catch { print("An error occurred: \(error)") }
+    }
+    
     /*
     func testManagedSyncWrite() {
 
@@ -218,9 +241,9 @@ class StorageObserver: NSObject, StorageObserving {
     
     var storageObservingToken: StorageObservingToken!
     
-    var intialCollectionHander: ((_ items: [Any], _ predicate: String?)-> Void)?
+    var intialCollectionHander: ((_ items: [Any], _ predicate: NSPredicate?)-> Void)?
     
-    var updatedCollectionHander: ((_ items: [Any], _ predicate: String?, _ deleted: [Int], _ inserted: [Int], _ modified: [Int])-> Void)?
+    var updatedCollectionHander: ((_ items: [Any], _ predicate: NSPredicate?, _ deleted: [Int], _ inserted: [Int], _ modified: [Int])-> Void)?
 
     var pets: [Pet] = []
     
@@ -236,7 +259,7 @@ class StorageObserver: NSObject, StorageObserving {
         print(#function)
     }
     
-    func didObserveInitialCollection<T: Storable>(items: [T], predicate: String?, keyPath: AnyKeyPath) {
+    func didObserveInitialCollection<T: Storable>(items: [T], predicate: NSPredicate?, keyPath: AnyKeyPath) {
         
         print(#function)
         
@@ -245,7 +268,7 @@ class StorageObserver: NSObject, StorageObserving {
         self.intialCollectionHander?(items, predicate)
     }
     
-    func didObserveUpdatedCollection<T: Storable>(items: [T], predicate: String?, deleted: [Int], inserted: [Int], modified: [Int], keyPath: AnyKeyPath) {
+    func didObserveUpdatedCollection<T: Storable>(items: [T], predicate: NSPredicate?, deleted: [Int], inserted: [Int], modified: [Int], keyPath: AnyKeyPath) {
         
         print(#function)
         

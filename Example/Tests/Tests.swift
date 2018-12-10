@@ -113,7 +113,8 @@ class Tests: XCTestCase {
             updatedExpection.fulfill()
         }
         
-        observer.setup()
+        do { observer.pets = try Pet.query("name BEGINSWITH 'M'", observer: observer, keyPath: \StorageObserver.pets) } catch { print("An error occurred: \(error)") }
+        
         print("Finished set up")
         
         let pug = Pet(name: "Mr. Pug")
@@ -142,11 +143,55 @@ class Tests: XCTestCase {
             XCTAssertEqual(try Person.count(), 2)
             XCTAssertEqual(try Pet.count(), 2)
 
-            let pets = try Pet.query(nil, joining: Person.self, foreignKey: "ownerId", joinedPredicateFormat: "name == '\(ephraim.name)'")
+            let pets = try Pet.query(nil, joining: Person.self, foreignKey: "ownerId", joinedPredicateFormat: "name BEGINSWITH 'E'")
             XCTAssertEqual(pets.first!.name, pug.name)
-
+            
         } catch { print("An error occurred: \(error)") }
     }
+    /*
+    func testJoinQueryWithObserver() {
+        
+        let initialExpection = XCTestExpectation()
+        let updatedExpection = XCTestExpectation()
+        
+        let observer = StorageObserver()
+        
+        observer.intialCollectionHander = { [weak observer] items, predicate in
+            
+            print(items, predicate ?? "")
+            
+            XCTAssertTrue(observer?.pets.isEmpty ?? false)
+            
+            observer?.updateUI()
+            
+            initialExpection.fulfill()
+        }
+        
+        observer.updatedCollectionHander = { [weak observer] items, predicate, deleted, inserted, modified in
+            
+            print(items, predicate ?? "", deleted, inserted, modified)
+            
+            XCTAssertEqual((items as! [Pet]), observer!.pets)
+            
+            observer?.updateUI()
+            
+            updatedExpection.fulfill()
+        }
+        
+        observer.pets = try! Pet.query(nil, joining: Person.self, foreignKey: "ownerId", joinedPredicateFormat: "name BEGINSWITH 'E'", observer: observer, keyPath: \StorageObserver.pets)
+        
+        XCTAssertTrue(observer.pets.isEmpty)
+        
+        let owners = [Person(name: "Eric", id: 1), Person(name: "Erlich", id: 2), Person(name: "Johnny", id: 3), Person(name: "Bobby", id: 4)]
+        try! owners.save()
+        
+        let pets = [Pet(name: "Kitty", id: 1, ownerId: 1), Pet(name: "Lucky", id: 2, ownerId: 1), Pet(name: "Roket", id: 3, ownerId: 4)]
+        try! pets.save()
+    
+        wait(for: [initialExpection, updatedExpection], timeout: 5)
+
+    }
+     */
     
     /*
     func testManagedSyncWrite() {
@@ -246,13 +291,6 @@ class StorageObserver: NSObject, StorageObserving {
     var updatedCollectionHander: ((_ items: [Any], _ predicate: NSPredicate?, _ deleted: [Int], _ inserted: [Int], _ modified: [Int])-> Void)?
 
     var pets: [Pet] = []
-    
-    func setup() {
-        
-        print(#function)
-        
-        do { self.pets = try Pet.query("name BEGINSWITH 'M'", observer: self, keyPath: \StorageObserver.pets) } catch { print("An error occurred: \(error)") }
-    }
     
     func updateUI() {
         

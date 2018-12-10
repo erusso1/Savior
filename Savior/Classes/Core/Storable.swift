@@ -1,7 +1,7 @@
 
 import Foundation
 
-public protocol Storable: Codable {
+public protocol Storable: Codable, Equatable {
     
     /// The associated `StorageManaging` type used facilite storage.
     associatedtype ManagedType: StorageManaging
@@ -45,9 +45,9 @@ public protocol Storable: Codable {
     
     static func query<T: Storable>(_ predicate: NSPredicate?, joining type: T.Type, foreignKey: String, joinedPredicate: NSPredicate?) throws -> [Self]
     
-    static func query<T: Storable, O: NSObject & StorageObserving>(_ predicateFormat: String?, args: [Any], joining type: T.Type, foreignKey: String, joinedPredicateFormat: String?, joinedArgs: [Any],  observer: O, keyPath: ReferenceWritableKeyPath<O, [Self]>) throws -> [Self]
+    //static func query<T: Storable, O: NSObject & StorageObserving>(_ predicateFormat: String?, args: [Any], joining type: T.Type, foreignKey: String, joinedPredicateFormat: String?, joinedArgs: [Any],  observer: O, keyPath: ReferenceWritableKeyPath<O, [Self]>) throws -> [Self]
     
-    static func query<T: Storable, O: NSObject & StorageObserving>(_ predicate: NSPredicate?, joining type: T.Type, foreignKey: String, joinedPredicate: NSPredicate?, observer: O, keyPath: ReferenceWritableKeyPath<O, [Self]>) throws -> [Self]
+    //static func query<T: Storable, O: NSObject & StorageObserving>(_ predicate: NSPredicate?, joining type: T.Type, foreignKey: String, joinedPredicate: NSPredicate?, observer: O, keyPath: ReferenceWritableKeyPath<O, [Self]>) throws -> [Self]
     
     /// Finds the `Storable` with the given `identifier` in storage, if it exists.
     static func find(byId identifier: IdentifierType) throws -> Self?
@@ -121,21 +121,21 @@ extension Storable {
         return try query(compoundPredicate)
     }
     
-    public static func query<T: Storable, O: NSObject & StorageObserving>(_ predicateFormat: String? = nil, args: [Any] = [], joining type: T.Type, foreignKey: String, joinedPredicateFormat: String? = nil, joinedArgs: [Any] = [], observer: O, keyPath: ReferenceWritableKeyPath<O, [Self]>) throws -> [Self] {
-        
-        let predicate: NSPredicate? = predicateFormat == nil ? nil : NSPredicate(format: predicateFormat!, args)
-        let joinedPredicate: NSPredicate? = joinedPredicateFormat == nil ? nil : NSPredicate(format: joinedPredicateFormat!, joinedArgs)
-        
-        return try query(predicate, joining: type, foreignKey: foreignKey, joinedPredicate: joinedPredicate, observer: observer, keyPath: keyPath)
-    }
-    
-    public static func query<T: Storable, O: NSObject & StorageObserving>(_ predicate: NSPredicate?, joining type: T.Type, foreignKey: String, joinedPredicate: NSPredicate? = nil, observer: O, keyPath: ReferenceWritableKeyPath<O, [Self]>) throws -> [Self] {
-        
-        let foreignKeys = try T.ManagedType.query(joinedPredicate).map { $0.identifier }
-        let foreignPredicate = NSPredicate(format: "(\(foreignKey) IN %@)", foreignKeys)
-        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, foreignPredicate].compactMap { $0 })
-        return try query(compoundPredicate, observer: observer, keyPath: keyPath)
-    }
+//    public static func query<T: Storable, O: NSObject & StorageObserving>(_ predicateFormat: String? = nil, args: [Any] = [], joining type: T.Type, foreignKey: String, joinedPredicateFormat: String? = nil, joinedArgs: [Any] = [], observer: O, keyPath: ReferenceWritableKeyPath<O, [Self]>) throws -> [Self] {
+//
+//        let predicate: NSPredicate? = predicateFormat == nil ? nil : NSPredicate(format: predicateFormat!, args)
+//        let joinedPredicate: NSPredicate? = joinedPredicateFormat == nil ? nil : NSPredicate(format: joinedPredicateFormat!, joinedArgs)
+//
+//        return try query(predicate, joining: type, foreignKey: foreignKey, joinedPredicate: joinedPredicate, observer: observer, keyPath: keyPath)
+//    }
+//
+//    public static func query<T: Storable, O: NSObject & StorageObserving>(_ predicate: NSPredicate?, joining type: T.Type, foreignKey: String, joinedPredicate: NSPredicate? = nil, observer: O, keyPath: ReferenceWritableKeyPath<O, [Self]>) throws -> [Self] {
+//
+//        let foreignKeys = try T.ManagedType.query(joinedPredicate).map { $0.identifier }
+//        let foreignPredicate = NSPredicate(format: "(\(foreignKey) IN %@)", foreignKeys)
+//        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, foreignPredicate].compactMap { $0 })
+//        return try query(compoundPredicate, observer: observer, keyPath: keyPath)
+//    }
 }
 
 extension Storable {
@@ -145,4 +145,9 @@ extension Storable {
         guard let item = try ManagedType.find(byId: String(identifier)) else { return nil }
         return Self.fromManagedObject(item)
     }
+}
+
+public func ==<T: Storable>(lhs: T, rhs: T) -> Bool {
+    
+    return String(lhs.identifier) == String(rhs.identifier)
 }

@@ -88,8 +88,10 @@ class Tests: XCTestCase {
     func testStorageObserver() {
     
         let initialExpection = XCTestExpectation()
-        let updatedExpection = XCTestExpectation()
-        
+        let savedExpection = XCTestExpectation()
+        let deletedExpection = XCTestExpectation()
+        let modifiedExpection = XCTestExpectation()
+
         let observer = StorageObserver()
         observer.intialCollectionHander = { [weak observer] items, predicate in
             
@@ -109,8 +111,12 @@ class Tests: XCTestCase {
             XCTAssertEqual(items.count, observer?.pets.count ?? 0)
             
             observer?.updateUI()
-
-            updatedExpection.fulfill()
+            
+            if !inserted.isEmpty { savedExpection.fulfill() }
+            
+            else if !deleted.isEmpty { deletedExpection.fulfill() }
+            
+            else if !modified.isEmpty { modifiedExpection.fulfill() }
         }
         
         do { observer.pets = try Pet.query("name BEGINSWITH 'M'", observer: observer, keyPath: \StorageObserver.pets) } catch { print("An error occurred: \(error)") }
@@ -122,9 +128,11 @@ class Tests: XCTestCase {
         
         do { try [pug, frenchie].save() } catch { print("An error occurred: \(error)") }
         
+        do { pug.ownerId = 12345; try pug.save() } catch { print("An error occurred: \(error)") }
+
         do { try pug.delete() } catch { print("An error occurred: \(error)") }
 
-        wait(for: [initialExpection, updatedExpection], timeout: 5)
+        wait(for: [initialExpection, savedExpection, deletedExpection, modifiedExpection], timeout: 5)
     }
     
     func testJoinQuery() {

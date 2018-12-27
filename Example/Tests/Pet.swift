@@ -15,7 +15,7 @@ public final class Pet {
     
     let name: String
     
-    let ownerId: Int64?
+    var ownerId: Int64?
     
     init(name: String, id: Int64? = Int64.random(in: 0..<Int64.max-1), ownerId: Int64? = nil) {
         

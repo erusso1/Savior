@@ -11,11 +11,11 @@ import Savior
 
 public final class Person {
     
-    let id: Int64?
+    let id: String
     
     let name: String
     
-    init(name: String, id: Int64? = Int64.random(in: 0..<Int64.max-1)) {
+    init(name: String, id: String) {
         
         self.id = id
         self.name = name
@@ -26,7 +26,11 @@ extension Person: Storable {
     
     public typealias ManagedType = ManagedPerson
         
-    public var identifier: Int64 { return id ?? 0 }
+    public var identifier: String { return id }
+    
+    public convenience init(managedObject: ManagedPerson) {
+        self.init(name: managedObject.name, id: managedObject.identifier)
+    }
 }
 
 extension Person: CustomDebugStringConvertible {

@@ -25,7 +25,7 @@ extension ManagedPerson: RealmStorageManaging {
     
     public func storageObject() -> Person {
         
-        return Person(name: self.name, id: Int64(self.identifier))
+        return Person(name: self.name, id: self.identifier)
     }
     
     public static func fromStorageObject(_ item: Person) -> ManagedPerson {

@@ -4,10 +4,10 @@ PODS:
   - Realm/Headers (3.13.1)
   - RealmSwift (3.13.1):
     - Realm (= 3.13.1)
-  - Savior (1.0.2):
-    - Savior/Realm (= 1.0.2)
-  - Savior/Core (1.0.2)
-  - Savior/Realm (1.0.2):
+  - Savior (1.0.3):
+    - Savior/Realm (= 1.0.3)
+  - Savior/Core (1.0.3)
+  - Savior/Realm (1.0.3):
     - RealmSwift
     - Savior/Core
 
@@ -26,7 +26,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
   RealmSwift: 8a1e6a02b7a08cd17a31e3115143fb69fe5f3fb9
-  Savior: 91f8485854906d211c4cc779d7455b601dacbefd
+  Savior: 2d097ca7185d205112c5001b8c5200530d434178
 
 PODFILE CHECKSUM: 7d792c8f61c00e213c780325e9d2c989cbde0590
 

@@ -29,21 +29,13 @@ extension ManagedPet: RealmStorageManaging {
     
     public func storageObject() -> Pet {
         
-        return Pet(name: self.name, id: Int64(self.identifier), ownerId: Int64(self.ownerId))
+        return Pet(name: self.name, id: self.identifier, ownerId: self.ownerId)
     }
     
-    public static func fromStorageObject(_ item: Pet) throws -> ManagedPet {
+    public static func fromStorageObject(_ item: Pet) -> ManagedPet {
         
         return ManagedPet(name: item.name, identifier: String(item.identifier), ownerId: item.ownerId == nil ? "" : String(item.ownerId!))
     }
     
     public typealias StorageType = Pet
-}
-
-extension ManagedPet {
-    
-    public func managedOwner() throws -> ManagedPerson? {
-        
-        return try ManagedPerson.find(byId: ownerId)
-    }
 }

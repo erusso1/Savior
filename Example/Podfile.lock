@@ -1,13 +1,13 @@
 PODS:
-  - Realm (3.12.0):
-    - Realm/Headers (= 3.12.0)
-  - Realm/Headers (3.12.0)
-  - RealmSwift (3.12.0):
-    - Realm (= 3.12.0)
-  - Savior (1.0.0):
-    - Savior/Realm (= 1.0.0)
-  - Savior/Core (1.0.0)
-  - Savior/Realm (1.0.0):
+  - Realm (3.13.1):
+    - Realm/Headers (= 3.13.1)
+  - Realm/Headers (3.13.1)
+  - RealmSwift (3.13.1):
+    - Realm (= 3.13.1)
+  - Savior (1.0.2):
+    - Savior/Realm (= 1.0.2)
+  - Savior/Core (1.0.2)
+  - Savior/Realm (1.0.2):
     - RealmSwift
     - Savior/Core
 
@@ -24,10 +24,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Realm: cdaef23c4ddb36ab1ddffed23f5a7f3332fc5585
-  RealmSwift: 5576324033f0aa5ef1e0a839a3da2281dff47a7f
-  Savior: 97dbf734e7e5dccec797b3180eb577509c29a0ec
+  Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
+  RealmSwift: 8a1e6a02b7a08cd17a31e3115143fb69fe5f3fb9
+  Savior: 91f8485854906d211c4cc779d7455b601dacbefd
 
-PODFILE CHECKSUM: d7649d8ecea5f874a199ff23ba35b5899d5616a6
+PODFILE CHECKSUM: 7d792c8f61c00e213c780325e9d2c989cbde0590
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0

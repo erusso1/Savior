@@ -10,81 +10,97 @@ class Tests: XCTestCase {
         
         super.setUp()
         
-        try! Savior.useProvider(Realm.self, encryptionKey: nil, enableMigrations: true)
+        Savior.shared.use(provider: Realm.self, encryptionKey: nil, enableMigrations: false)
     }
         
     override func setUp() {
-        super.setUp()
         
-        do { try Savior.clear() } catch { print("An error occurred: \(error)") }
+        super.setUp()
+        Savior.shared.clear(provider: Realm.self)
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
     
-    func testCrudOperations() {
-    
-        do {
-            
-            let preCount = try Pet.query().count
-            
-            let petId: Int64 = 12345
-            let ownerId: Int64 = 67890
+    func testAdd() {
+        
+        var preCount = 0
+        
+        for i in 0..<20 {
             
             // Add Pet
-            let json: [String : Any] = ["id" : petId, "name" : "Lily Wily Bily Bear", "ownerId" : ownerId]
-            let pet = try Pet.from(json: json)
-            try pet.save()
+            let pet = Pet(name: "Lily Wily Bily Bear", id: "\(i)", ownerId: nil)
+            pet.save()
             
-            // Query all Pets
-            let pets = try Pet.query()
-            let postCount = pets.count
-            print("There are \(postCount) pets - \(pets.map { $0.name })")
-        
-            if preCount == 0 { XCTAssertEqual(postCount, 1) }
-            else { XCTAssertEqual(preCount, postCount) }
+            XCTAssertEqual(Pet.count(), preCount+1)
             
-            // Find Pet by Id
-            let foundPet = try Pet.find(byId: petId)
-            let unfoundPet = try Pet.find(byId: 000000)
-            XCTAssertNotNil(foundPet)
-            print("Found pet with id \(petId) named \(foundPet!.name)")
-            XCTAssertNil(unfoundPet)
-            XCTAssertEqual(foundPet?.name, pet.name)
-            
-            if try foundPet?.owner() == nil { print("\(foundPet!.name) doesn't have an owner yet :(") }
-            
-            // Add owner
-            let owner = Person(name: "Ephraim", id: ownerId)
-            try owner.save()
-    
-            XCTAssertEqual(owner.name, try foundPet?.owner()?.name)
-            
-            print("\(foundPet!.name)'s new owner is \(owner.name)!")
-            
-            let newOwner = Person(name: "Tianchun", id: ownerId)
-            try newOwner.save()
-        
-            XCTAssertEqual(newOwner.name, try foundPet?.owner()?.name)
-            XCTAssertEqual(try Person.count(), 1)
-            
-            try newOwner.delete()
-            XCTAssertEqual(try Person.count(), 0)
-            
-            try Pet.deleteAll()
-            XCTAssertEqual(try Pet.count(), 0)
-            
-            let array: [Pet] = [Pet(name: "Billy"), Pet(name: "Bobby")]
-            try array.save()
-            XCTAssertEqual(try Pet.count(), array.count)
-            try array.delete()
-            XCTAssertEqual(try Pet.count(), 0)
+            preCount += 1
+        }
 
-        } catch { print("An error occurred: \(error)") }
     }
     
+    func testCrudOperations() {
+    
+        let preCount = Pet.query().count
+
+        XCTAssertEqual(preCount, 0)
+
+        let petId  = "12345"
+        let ownerId = "67890"
+        
+        // Add Pet
+        let pet = Pet(name: "Lily Wily Bily Bear", id: petId, ownerId: ownerId)
+        pet.save()
+        
+        XCTAssertEqual(preCount+1, Pet.count())
+
+        // Query all Pets
+        let pets = Pet.query()
+        let postCount = pets.count
+        print("There are \(postCount) pets - \(pets)")
+
+        if preCount == 0 { XCTAssertEqual(postCount, 1) }
+        else { XCTAssertEqual(preCount, postCount) }
+
+        // Find Pet by Id
+        let foundPet = Pet.find(byId: petId)
+        let unfoundPet = Pet.find(byId: "000000")
+        XCTAssertNotNil(foundPet)
+        print("Found pet with id \(petId) named \(foundPet!.name)")
+        XCTAssertNil(unfoundPet)
+        XCTAssertEqual(foundPet?.name, pet.name)
+
+        if foundPet?.owner() == nil { print("\(foundPet!.name) doesn't have an owner yet :(") }
+
+        // Add owner
+        let owner = Person(name: "Ephraim", id: ownerId)
+        owner.save()
+
+        XCTAssertEqual(owner.name, foundPet?.owner()?.name)
+
+        print("\(foundPet!.name)'s new owner is \(owner.name)!")
+
+        let newOwner = Person(name: "Tianchun", id: ownerId)
+        newOwner.save()
+
+        XCTAssertEqual(newOwner.name, foundPet?.owner()?.name)
+        XCTAssertEqual(Person.count(), 1)
+
+        newOwner.delete()
+        XCTAssertEqual(Person.count(), 0)
+
+        Pet.deleteAll()
+        XCTAssertEqual(Pet.count(), 0)
+
+        let array: [Pet] = [Pet(name: "Billy", id: "gwehwergreg"), Pet(name: "Bobby", id: "wegerh45ergh5ergf")]
+        array.save()
+        XCTAssertEqual(Pet.count(), array.count)
+        array.delete()
+        XCTAssertEqual(Pet.count(), 0)
+    }
+
     func testStorageObserver() {
     
         let initialExpection = XCTestExpectation()
@@ -96,6 +112,8 @@ class Tests: XCTestCase {
         observer.intialCollectionHander = { [weak observer] items, predicate in
             
             print(items, predicate ?? "")
+            
+            XCTAssertTrue(items.isEmpty)
             
             XCTAssertTrue(observer?.pets.isEmpty ?? false)
             
@@ -119,43 +137,80 @@ class Tests: XCTestCase {
             else if !modified.isEmpty { modifiedExpection.fulfill() }
         }
         
-        do { observer.pets = try Pet.query("name BEGINSWITH 'M'", observer: observer, keyPath: \StorageObserver.pets) } catch { print("An error occurred: \(error)") }
+        observer.pets = Pet.query(observer: observer, keyPath: \StorageObserver.pets)
         
         print("Finished set up")
         
-        let pug = Pet(name: "Mr. Pug")
-        let frenchie = Pet(name: "Lily Wily")
+        let pug = Pet(name: "Mr. Pug", id: "wfweg4egqwagergqwf")
+        let frenchie = Pet(name: "Lily Wily", id: "rhrewegwrth56rhtgwef")
         
-        do { try [pug, frenchie].save() } catch { print("An error occurred: \(error)") }
-        
-        do { pug.ownerId = 12345; try pug.save() } catch { print("An error occurred: \(error)") }
+        [pug, frenchie].save()
+        pug.ownerId = "12345"
+        pug.save()
+        pug.delete()
 
-        do { try pug.delete() } catch { print("An error occurred: \(error)") }
-
-        wait(for: [initialExpection, savedExpection, deletedExpection, modifiedExpection], timeout: 5)
+        wait(for: [initialExpection, savedExpection, deletedExpection, modifiedExpection], timeout: 500)
     }
     
     func testJoinQuery() {
         
-        do {
-            
-            let ephraim = Person(name: "Ephraim", id: 1)
-            let chloe = Person(name: "Chloe", id: 2)
-            
-            let lilly = Pet(name: "Lilly", id: 1, ownerId: 2)
-            let pug = Pet(name: "Mr. Pug", id: 2, ownerId: 1)
-            
-            try [ephraim, chloe].save()
-            try [lilly, pug].save()
-            
-            XCTAssertEqual(try Person.count(), 2)
-            XCTAssertEqual(try Pet.count(), 2)
-
-            let pets = try Pet.query(nil, joining: Person.self, foreignKey: "ownerId", joinedPredicateFormat: "name BEGINSWITH 'E'")
-            XCTAssertEqual(pets.first!.name, pug.name)
-            
-        } catch { print("An error occurred: \(error)") }
+        let ephraim = Person(name: "Ephraim", id: "1")
+        let chloe = Person(name: "Chloe", id: "2")
+        
+        let lilly = Pet(name: "Lilly", id: "1", ownerId: "2")
+        let pug = Pet(name: "Mr. Pug", id: "2", ownerId: "1")
+        
+        [ephraim, chloe].save()
+        [lilly, pug].save()
+        
+        XCTAssertEqual(Person.count(), 2)
+        XCTAssertEqual(Pet.count(), 2)
+        
+        let pets = Pet.query(nil, joining: Person.self, foreignKey: "ownerId", joinedPredicateFormat: "name BEGINSWITH 'E'")
+        XCTAssertEqual(pets.first!.name, pug.name)
     }
+    
+    func testValueQuery() {
+        
+        let pets: [Pet] = Array(0..<100).map { Pet(name: "Pet_\($0)", id: String($0), ownerId: nil) }
+        
+        pets.save()
+        
+        let values = Pet.values(filteredBy: nil, keyPath: "name", type: String.self)
+        print(values)
+        XCTAssertEqual(values.count, pets.count)
+    }
+    
+    func testThreading() {
+                
+        let expectation = XCTestExpectation()
+    
+        DispatchQueue.global(qos: .utility).async {
+            
+            let pets: [Pet] = Array(0..<100).map { Pet(name: "Pet_\($0)", id: String($0), ownerId: nil) }
+
+            pets.save()
+            
+            let values = Pet.values(filteredBy: nil, keyPath: "name", type: String.self)
+            print(values)
+            XCTAssertEqual(values.count, pets.count)
+            Pet.deleteAll()
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+                
+                //print(Pet.query())
+                let values0 = Pet.query()
+                let count0 = Pet.count()
+                XCTAssertEqual(values0.count, count0)
+                XCTAssertEqual(count0, 0)
+                
+                expectation.fulfill()
+            }
+        }
+        
+        wait(for: [expectation], timeout: 5000)
+    }
+    
     /*
     func testJoinQueryWithObserver() {
         

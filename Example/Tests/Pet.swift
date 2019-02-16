@@ -11,13 +11,13 @@ import Savior
 
 public final class Pet {
     
-    let id: Int64?
+    let id: String
     
     let name: String
     
-    var ownerId: Int64?
+    var ownerId: String?
     
-    init(name: String, id: Int64? = Int64.random(in: 0..<Int64.max-1), ownerId: Int64? = nil) {
+    init(name: String, id: String, ownerId: String? = nil) {
         
         self.id = id
         self.name = name
@@ -29,15 +29,20 @@ extension Pet: Storable {
         
     public typealias ManagedType = ManagedPet
         
-    public var identifier: Int64 { return id ?? 0 }
+    public var identifier: String { return id }
+    
+    public convenience init(managedObject: ManagedPet) {
+        self.init(name: managedObject.name, id: managedObject.identifier, ownerId:  managedObject.ownerId)
+    }
 }
 
 extension Pet {
     
-    public func owner() throws -> Person? {
+    public func owner() -> Person? {
+
+        guard let ownerId = self.ownerId else { return nil }
         
-        guard let managedOwner = try managedObject().managedOwner() else { return nil }
-        return Person.fromManagedObject(managedOwner) 
+        return Person.find(byId: ownerId)
     }
 }
 

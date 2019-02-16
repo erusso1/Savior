@@ -7,33 +7,26 @@
 
 import Foundation
 
-public struct Savior {
+public final class Savior {
     
-    internal static var provider: StorageProviding?
+    public static let shared = Savior()
     
-    public static func useProvider<T: StorageProviding>(_ provider: T.Type, encryptionKey: Data? = nil, enableMigrations: Bool = true) throws {
+    public func use<T: StorageProviding>(provider: T.Type, encryptionKey: Data? = nil, enableMigrations: Bool = true) {
         
-        self.provider = try T.instance(encryptionKey: encryptionKey, enableMigrations: enableMigrations)
+        T.use(encryptionKey: encryptionKey, enableMigrations: enableMigrations)
     }
     
-    public static func clear() throws {
+    public func clear<T: StorageProviding>(provider: T.Type) {
         
-        guard let provider = self.provider else { throw SaviorError.noProvider }
-        
-        try provider.clear()
+        T.clear()
     }
 }
 
 public protocol StorageProviding {
     
-    static func instance(encryptionKey: Data?, enableMigrations: Bool) throws -> Self
+    static func use(encryptionKey: Data?, enableMigrations: Bool)
     
-    func clear() throws
-}
-
-enum SaviorError: Error {
+    static func instance() -> Self
     
-    case noProvider
-    
-    case incorrectProvider(provider: StorageProviding)
+    static func clear()
 }

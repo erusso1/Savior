@@ -19,7 +19,7 @@
 		F3B8D6CF21A6366A00D44980 /* Pet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B8D6CA21A6366900D44980 /* Pet.swift */; };
 		F3B8D6D021A6366A00D44980 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B8D6CB21A6366900D44980 /* Person.swift */; };
 		F3B8D6D121A6366A00D44980 /* ManagedPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B8D6CC21A6366900D44980 /* ManagedPerson.swift */; };
-		F3B8D6D221A6366A00D44980 /* RealmObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B8D6CD21A6366A00D44980 /* RealmObject.swift */; };
+		F3DCA85122183EC000A56CBC /* BaseManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3DCA85022183EC000A56CBC /* BaseManagedObject.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +56,7 @@
 		F3B8D6CA21A6366900D44980 /* Pet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pet.swift; sourceTree = "<group>"; };
 		F3B8D6CB21A6366900D44980 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		F3B8D6CC21A6366900D44980 /* ManagedPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagedPerson.swift; sourceTree = "<group>"; };
-		F3B8D6CD21A6366A00D44980 /* RealmObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmObject.swift; sourceTree = "<group>"; };
+		F3DCA85022183EC000A56CBC /* BaseManagedObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseManagedObject.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,9 +149,9 @@
 				F3B8D6C921A6366900D44980 /* ManagedPet.swift */,
 				F3B8D6CB21A6366900D44980 /* Person.swift */,
 				F3B8D6CA21A6366900D44980 /* Pet.swift */,
-				F3B8D6CD21A6366A00D44980 /* RealmObject.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 				607FACEB1AFB9204008FA782 /* Tests.swift */,
+				F3DCA85022183EC000A56CBC /* BaseManagedObject.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -364,7 +364,7 @@
 			files = (
 				F3B8D6D121A6366A00D44980 /* ManagedPerson.swift in Sources */,
 				F3B8D6CF21A6366A00D44980 /* Pet.swift in Sources */,
-				F3B8D6D221A6366A00D44980 /* RealmObject.swift in Sources */,
+				F3DCA85122183EC000A56CBC /* BaseManagedObject.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 				F3B8D6D021A6366A00D44980 /* Person.swift in Sources */,
 				F3B8D6CE21A6366A00D44980 /* ManagedPet.swift in Sources */,

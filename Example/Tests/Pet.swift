@@ -30,10 +30,6 @@ extension Pet: Storable {
     public typealias ManagedType = ManagedPet
         
     public var identifier: String { return id }
-    
-    public convenience init(managedObject: ManagedPet) {
-        self.init(name: managedObject.name, id: managedObject.identifier, ownerId:  managedObject.ownerId)
-    }
 }
 
 extension Pet {

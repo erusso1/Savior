@@ -18,7 +18,7 @@ extension Sequence where Element : Storable, Element.ManagedType : (Object & Rea
     public func delete() {
         
         let realm = Realm.instance()
-        let result = realm.objects(Element.ManagedType.self).filter("identifier IN %@", self.map { String($0.identifier) })
+        let result = realm.objects(Element.ManagedType.self).filter("\(Element.ManagedType.primaryKey()!) IN %@", self.map { String($0.identifier) })
         try! realm.write {
             realm.delete(result)
         }

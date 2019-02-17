@@ -11,9 +11,9 @@ public final class Savior {
     
     public static let shared = Savior()
     
-    public func use<T: StorageProviding>(provider: T.Type, encryptionKey: Data? = nil, enableMigrations: Bool = true) {
+    public func use<T: StorageProviding>(provider: T.Type, encryptionKey: Data? = nil, enableMigrations: Bool = true, filename: String? = nil) {
         
-        T.use(encryptionKey: encryptionKey, enableMigrations: enableMigrations)
+        T.use(encryptionKey: encryptionKey, enableMigrations: enableMigrations, filename: filename)
     }
     
     public func clear<T: StorageProviding>(provider: T.Type) {
@@ -24,7 +24,7 @@ public final class Savior {
 
 public protocol StorageProviding {
     
-    static func use(encryptionKey: Data?, enableMigrations: Bool)
+    static func use(encryptionKey: Data?, enableMigrations: Bool, filename: String?)
     
     static func instance() -> Self
     

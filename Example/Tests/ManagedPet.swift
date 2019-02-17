@@ -10,7 +10,7 @@ import Foundation
 import RealmSwift
 import Savior
 
-@objcMembers public final class ManagedPet: RealmObject {
+@objcMembers public final class ManagedPet: BaseManagedObject {
     
     public dynamic var name: String = ""
     

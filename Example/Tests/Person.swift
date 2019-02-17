@@ -27,10 +27,6 @@ extension Person: Storable {
     public typealias ManagedType = ManagedPerson
         
     public var identifier: String { return id }
-    
-    public convenience init(managedObject: ManagedPerson) {
-        self.init(name: managedObject.name, id: managedObject.identifier)
-    }
 }
 
 extension Person: CustomDebugStringConvertible {

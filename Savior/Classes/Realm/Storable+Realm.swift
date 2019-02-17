@@ -30,7 +30,7 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
     
     public func delete() {
         
-        guard let item: ManagedType = Realm.instance().objects(ManagedType.self).filter("identifier == '\(String(identifier))'").first else { return }
+        guard let item: ManagedType = Realm.instance().objects(ManagedType.self).filter("\(ManagedType.primaryKey()!) == '\(String(identifier))'").first else { return }
         let realm = Realm.instance()
         try! realm.write {
             realm.delete(item)
@@ -51,12 +51,19 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
         return query(predicate).count
     }
     
+    public static func all() -> [Self] { return query() }
+    
+    public static func identifiers() -> [IdentifierType] {
+        
+        return values(keyPath: "\(ManagedType.primaryKey()!)", type: IdentifierType.self)
+    }
+    
     public static func query(_ predicate: NSPredicate? = nil) -> [Self] {
         
         return Realm.instance().objects(ManagedType.self).filter(predicate ?? .true).map { $0.storageObject() }
     }
     
-    public static func query(_ predicateFormat: String? = nil, args: Any...) -> [Self] {
+    public static func query(_ predicateFormat: String? = nil, args: CVarArg...) -> [Self] {
         
         let predicate: NSPredicate? = predicateFormat == nil ? nil : NSPredicate(format: predicateFormat!, args)
         return query(predicate)
@@ -64,10 +71,15 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
     
     public static func find(byId identifier: IdentifierType) -> Self? {
         
-        return query("identifier == '\(String(identifier))'").first
+        return query("\(ManagedType.primaryKey()!) == '\(String(identifier))'").first
+    }
+    
+    public static func find(byIds identifiers: [IdentifierType]) -> [Self] {
+        let predicate = NSPredicate(format: "\(ManagedType.primaryKey()!) IN %@", identifiers.map { String($0) })
+        return query(predicate)
     }
 
-    public static func query<T: NSObject & StorageObserving>(_ predicateFormat: String? = nil, args: [Any] = [], observer: T, keyPath: ReferenceWritableKeyPath<T, [ManagedType.StorageType]>) -> [Self] {
+    public static func query<T: NSObject & StorageObserving>(_ predicateFormat: String? = nil, args: [CVarArg] = [], observer: T, keyPath: ReferenceWritableKeyPath<T, [ManagedType.StorageType]>) -> [Self] {
         
         let predicate: NSPredicate? = predicateFormat == nil ? nil : NSPredicate(format: predicateFormat!, args)
         
@@ -99,7 +111,7 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
         return items.map { $0.storageObject() }
     }
     
-    public static func query<T: Storable>(_ predicateFormat: String? = nil, args: [Any] = [], joining type: T.Type, foreignKey: String, joinedPredicateFormat: String? = nil, joinedArgs: [Any] = []) -> [Self] where T.ManagedType : RealmObject, T.ManagedType.StorageType == T {
+    public static func query<T: Storable>(_ predicateFormat: String? = nil, args: [CVarArg] = [], joining type: T.Type, foreignKey: String, joinedPredicateFormat: String? = nil, joinedArgs: [CVarArg] = []) -> [Self] where T.ManagedType : RealmObject, T.ManagedType.StorageType == T {
         
         let predicate: NSPredicate? = predicateFormat == nil ? nil : NSPredicate(format: predicateFormat!, args)
         let joinedPredicate: NSPredicate? = joinedPredicateFormat == nil ? nil : NSPredicate(format: joinedPredicateFormat!, joinedArgs)
@@ -114,13 +126,13 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
         return query(compoundPredicate)
     }
     
-    public static func values<T>(filteredBy predicateFormat: String?, args: [Any], keyPath: String, type: T.Type) -> [T] {
+    public static func values<T>(filteredBy predicateFormat: String? = nil, args: [CVarArg] = [], keyPath: String, type: T.Type) -> [T] {
         
         let predicate: NSPredicate? = predicateFormat == nil ? nil : NSPredicate(format: predicateFormat!, args)
         return values(filteredBy: predicate, keyPath: keyPath, type: type)
     }
     
-    public static func values<T>(filteredBy predicate: NSPredicate?, keyPath: String, type: T.Type) -> [T] {
+    public static func values<T>(filteredBy predicate: NSPredicate? = nil, keyPath: String, type: T.Type) -> [T] {
         
         return Realm.instance().objects(ManagedType.self).filter(predicate ?? .true).value(forKeyPath: "@distinctUnionOfObjects.\(keyPath)") as? [T] ?? []
     }

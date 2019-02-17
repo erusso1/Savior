@@ -28,17 +28,27 @@ class Tests: XCTestCase {
         
         var preCount = 0
         
-        for i in 0..<20 {
+        let total = 20
+        let range = 0..<total
+        for i in range {
             
             // Add Pet
-            let pet = Pet(name: "Lily Wily Bily Bear", id: "\(i)", ownerId: nil)
+            let pet = Pet(name: "Pet \(i)", id: "\(i)", ownerId: nil)
             pet.save()
             
             XCTAssertEqual(Pet.count(), preCount+1)
             
             preCount += 1
         }
-
+        
+        XCTAssertEqual(Pet.all().count, total)
+        
+        XCTAssertEqual(Pet.identifiers().map { Int($0)! }.sorted(), Array(range))
+        
+        let idArr = ["3","7","4","9"]
+        let idPets = Pet.find(byIds: idArr)
+                
+        XCTAssertEqual(idPets.map { $0.name }.sorted(), idArr.map { "Pet \($0)" }.sorted())
     }
     
     func testCrudOperations() {

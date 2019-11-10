@@ -28,16 +28,28 @@ extension Realm: StorageProviding {
         realmConfiguration = config
     }
     
-    public static func instance() -> Realm {
+    public static func instance() -> Realm? {
         
-        return try! Realm(configuration: realmConfiguration)
+        do {
+            let realm = try Realm(configuration: realmConfiguration)
+            return realm
+        }
+        catch {
+            Savior.logger?.log("An error occurred initializing Realm instance - Error: \(error)")
+            return nil
+        }
     }
     
     public static func clear() {
         
-        let realm = Realm.instance()
-        try! realm.write {
-            realm.deleteAll()
+        guard let realm = Realm.instance() else { return }
+        do {
+            try realm.write {
+                realm.deleteAll()
+            }
+        }
+        catch {
+            Savior.logger?.log("An error occurred saving sequence to Realm - Sequence: \(self), Error: \(error)")
         }
     }
 }

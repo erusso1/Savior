@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Savior'
-  s.version          = '1.1.2'
+  s.version          = '1.2.0'
   s.summary          = 'Savior is a lightweight Swift ORM that makes persistence delightful.'
 
 # This description is used to generate tags and improve search results.
@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '10.0'
   s.default_subspec = 'Realm'
   s.source_files = 'Savior/Classes/**/*'
-  s.swift_version = '4.2'
+  s.swift_version = '5.0'
   
   s.subspec 'Core' do |core|
       core.ios.deployment_target = '10.0'

@@ -22,27 +22,45 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
     
     public func save() {
         
-        let realm = Realm.instance()
-        try! realm.write {
-            realm.add(managedObject(), update: true)
+        guard let realm = Realm.instance() else { return }
+        
+        do {
+            try realm.write {
+                realm.add(managedObject(), update: .modified)
+            }
+        }
+        catch {
+            Savior.logger?.log("An error occurred saving object to Realm - Object: \(self), Error: \(error)")
         }
     }
     
     public func delete() {
         
-        guard let item: ManagedType = Realm.instance().objects(ManagedType.self).filter("\(ManagedType.primaryKey()!) == '\(String(identifier))'").first else { return }
-        let realm = Realm.instance()
-        try! realm.write {
-            realm.delete(item)
+        guard let realm = Realm.instance() else { return }
+        
+        guard let item: ManagedType = realm.objects(ManagedType.self).filter("\(ManagedType.primaryKey()!) == '\(String(identifier))'").first else { return }
+        do {
+            try realm.write {
+                realm.delete(item)
+            }
+        }
+        catch {
+            Savior.logger?.log("An error occurred deleting object from Realm - Object: \(self), Error: \(error)")
         }
     }
     
     public static func deleteAll() {
         
-        let realm = Realm.instance()
+        guard let realm = Realm.instance() else { return }
+        
         let items: Results<ManagedType> = realm.objects(ManagedType.self)
-        try! realm.write {
-            realm.delete(items)
+        do {
+            try realm.write {
+                realm.delete(items)
+            }
+        }
+        catch {
+            Savior.logger?.log("An error occurred deleting all objects of \(Self.self) from Realm - Error: \(error)")
         }
     }
     
@@ -59,8 +77,10 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
     }
     
     public static func query(_ predicate: NSPredicate? = nil) -> [Self] {
-        
-        return Realm.instance().objects(ManagedType.self).filter(predicate ?? .true).map { $0.storageObject() }
+
+        guard let realm = Realm.instance() else { return [] }
+
+        return realm.objects(ManagedType.self).filter(predicate ?? .true).map { $0.storageObject() }
     }
     
     public static func query(_ predicateFormat: String? = nil, args: CVarArg...) -> [Self] {
@@ -88,7 +108,9 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
     
     public static func query<T: NSObject & StorageObserving>(_ predicate: NSPredicate? = nil, observer: T, keyPath: ReferenceWritableKeyPath<T, [ManagedType.StorageType]>) -> [Self] {
         
-        let items: Results<ManagedType> = Realm.instance().objects(ManagedType.self).filter(predicate ?? .true)
+        guard let realm = Realm.instance() else { return [] }
+        
+        let items: Results<ManagedType> = realm.objects(ManagedType.self).filter(predicate ?? .true)
     
         observer.storageObservingToken = items.observe { [weak observer] changes in
             
@@ -134,6 +156,8 @@ extension Storable where ManagedType: RealmObject, ManagedType.StorageType == Se
     
     public static func values<T>(filteredBy predicate: NSPredicate? = nil, keyPath: String, type: T.Type) -> [T] {
         
-        return Realm.instance().objects(ManagedType.self).filter(predicate ?? .true).value(forKeyPath: "@distinctUnionOfObjects.\(keyPath)") as? [T] ?? []
+        guard let realm = Realm.instance() else { return [] }
+        
+        return realm.objects(ManagedType.self).filter(predicate ?? .true).value(forKeyPath: "@distinctUnionOfObjects.\(keyPath)") as? [T] ?? []
     }
 }

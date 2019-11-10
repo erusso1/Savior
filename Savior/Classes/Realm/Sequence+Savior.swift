@@ -11,16 +11,23 @@ import RealmSwift
 extension Sequence where Element : Storable, Element.ManagedType : (Object & RealmStorageManaging) {
     
     public func save() {
-        
+                
         self.map { $0.managedObject() }.save()
     }
     
     public func delete() {
         
-        let realm = Realm.instance()
+        guard let realm = Realm.instance() else { return }
+        
         let result = realm.objects(Element.ManagedType.self).filter("\(Element.ManagedType.primaryKey()!) IN %@", self.map { String($0.identifier) })
-        try! realm.write {
-            realm.delete(result)
+        do {
+            try realm.write {
+                realm.delete(result)
+            }
+        }
+        catch {
+            Savior.logger?.log("An error occurred remoing sequence from Realm - Sequence: \(self), Error: \(error)")
+
         }
     }
 }
@@ -29,9 +36,15 @@ extension Sequence where Element : (Object & RealmStorageManaging) {
     
     public func save() {
         
-        let realm = Realm.instance()
-        try! realm.write {
-            realm.add(self, update: true)
+        guard let realm = Realm.instance() else { return }
+        
+        do {
+            try realm.write {
+                realm.add(self, update: .modified)
+            }
+        }
+        catch {
+            Savior.logger?.log("An error occurred saving sequence to Realm - Sequence: \(self), Error: \(error)")
         }
     }
 }
